@@ -126,7 +126,7 @@ if (PROD) {
   const distPath = path.join(__dirname, 'dist');
   app.use(express.static(distPath));
   // SPA fallback — 모든 경로를 index.html로 (Express 5 호환)
-  app.get('{*path}', (req, res) => {
+  app.get('*', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
