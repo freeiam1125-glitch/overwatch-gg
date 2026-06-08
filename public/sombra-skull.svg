@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="white">
+  <!-- Outer hexagonal skull body -->
+  <path d="M50 3
+    L73 13 L87 33 L87 57
+    C87 70 79 80 68 85
+    L65 87 L65 93 L35 93 L35 87 L32 85
+    C21 80 13 70 13 57
+    L13 33 L27 13 Z"
+    fill="white"/>
+
+  <!-- Left eye socket (black cutout) -->
+  <rect x="22" y="35" width="22" height="20" rx="3" fill="#080810"/>
+
+  <!-- Right eye socket (black cutout) -->
+  <rect x="56" y="35" width="22" height="20" rx="3" fill="#080810"/>
+
+  <!-- Nose bridge cutout -->
+  <rect x="44" y="48" width="12" height="10" rx="2" fill="#080810"/>
+
+  <!-- Teeth gaps (3 teeth = 4 gaps) -->
+  <rect x="35" y="87" width="6"  height="8" rx="1" fill="#080810"/>
+  <rect x="47" y="87" width="6"  height="8" rx="1" fill="#080810"/>
+  <rect x="59" y="87" width="6"  height="8" rx="1" fill="#080810"/>
+
+  <!-- Corner accent diamonds -->
+  <polygon points="50,0  53,5  50,10 47,5"  fill="white"/>
+  <polygon points="85,28 90,31  87,36 82,33" fill="white"/>
+  <polygon points="85,64 90,67  87,72 82,69" fill="white"/>
+  <polygon points="50,90 53,95  50,100 47,95" fill="white"/>
+  <polygon points="15,64 10,67  13,72 18,69" fill="white"/>
+  <polygon points="15,28 10,31  13,36 18,33" fill="white"/>
+</svg>
