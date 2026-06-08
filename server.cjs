@@ -124,10 +124,16 @@ app.get('/api/auth/logout', (req, res) => {
 // ── 5. 프로덕션: 빌드된 React 서빙 ───────────────
 if (PROD) {
   const distPath = path.join(__dirname, 'dist');
+  console.log('Serving static from:', distPath);
   app.use(express.static(distPath));
-  // SPA fallback — 모든 경로를 index.html로 (Express 5 호환)
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    const indexPath = path.join(distPath, 'index.html');
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('sendFile error:', err);
+        res.status(500).send('Build files not found. Run npm run build first.');
+      }
+    });
   });
 }
 
