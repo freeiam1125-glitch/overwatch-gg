@@ -125,8 +125,8 @@ app.get('/api/auth/logout', (req, res) => {
 if (PROD) {
   const distPath = path.join(__dirname, 'dist');
   app.use(express.static(distPath));
-  // SPA fallback — 모든 경로를 index.html로
-  app.get('*', (req, res) => {
+  // SPA fallback — 모든 경로를 index.html로 (Express 5 호환)
+  app.get('/*splat', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
