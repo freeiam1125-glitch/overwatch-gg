@@ -26,16 +26,19 @@ if (!PROD) {
   app.use(cors({ origin: ORIGIN, credentials: true }));
 }
 
+// Railway 리버스 프록시 신뢰 설정 (필수)
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(session({
   secret: SESSION_SECRET || 'boop-gg-secret',
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     httpOnly: true,
-    secure: PROD,           // HTTPS 환경에서만 true
-    sameSite: PROD ? 'none' : 'lax',
-    maxAge: 1000 * 60 * 60 * 24, // 24h
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24,
   },
 }));
 
@@ -44,36 +47,50 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 // ── 1. 블리자드 로그인 시작 ────────────────────────
 app.get('/api/auth/bnet', (req, res) => {
+  const state = Math.random().toString(36).slice(2);
+  req.session.oauthState = state;
   const params = new URLSearchParams({
     client_id:     BNET_CLIENT_ID,
     redirect_uri:  BNET_REDIRECT_URI,
     response_type: 'code',
     scope:         'openid',
+    state,
   });
   res.redirect(`https://oauth.battle.net/authorize?${params}`);
 });
 
 // ── 2. 콜백: code → access_token ─────────────────
 app.get('/api/auth/callback', async (req, res) => {
-  const { code } = req.query;
-  if (!code) return res.redirect(`${ORIGIN}?auth=error`);
+  const { code, state } = req.query;
+  console.log('[callback] code:', !!code, '| state:', state, '| sessionState:', req.session.oauthState);
+  if (!code) {
+    console.log('[callback] ERROR: no code');
+    return res.redirect(`${ORIGIN}?auth=error`);
+  }
+  // state 검증 (세션이 있을 때만)
+  if (req.session.oauthState && state !== req.session.oauthState) {
+    console.log('[callback] ERROR: state mismatch');
+    return res.redirect(`${ORIGIN}?auth=error`);
+  }
 
   try {
+    console.log('[token] client_id:', BNET_CLIENT_ID, '| redirect_uri:', BNET_REDIRECT_URI);
     const tokenRes = await axios.post(
-      'https://oauth.battle.net/token',
+      'https://kr.battle.net/oauth/token',
       new URLSearchParams({
-        grant_type:   'authorization_code',
+        grant_type:    'authorization_code',
         code,
-        redirect_uri: BNET_REDIRECT_URI,
+        redirect_uri:  BNET_REDIRECT_URI,
+        client_id:     BNET_CLIENT_ID,
+        client_secret: BNET_CLIENT_SECRET,
       }),
       {
-        auth: { username: BNET_CLIENT_ID, password: BNET_CLIENT_SECRET },
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       }
     );
     const accessToken = tokenRes.data.access_token;
 
-    const userRes = await axios.get('https://oauth.battle.net/userinfo', {
+    const userRes = await axios.get('https://kr.battle.net/oauth/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
@@ -137,6 +154,6 @@ if (PROD) {
   });
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🔒 BOOP.GG Server — port ${PORT} [${PROD ? 'PRODUCTION' : 'DEV'}]`);
 });
