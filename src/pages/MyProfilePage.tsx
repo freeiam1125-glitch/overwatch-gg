@@ -10,8 +10,13 @@ export default function MyProfilePage() {
 
   // 로그인 상태면 플레이어 프로필로 자동 이동
   useEffect(() => {
-    if (!loading && user?.playerId) {
-      navigate(`/player/${encodeURIComponent(user.playerId)}`, { replace: true });
+    if (!loading && user) {
+      if (user.playerId) {
+        navigate(`/player/${encodeURIComponent(user.playerId)}`, { replace: true });
+      } else {
+        // playerId를 못 찾은 경우 battletag로 직접 이동
+        navigate(`/player/${encodeURIComponent(user.battletag)}`, { replace: true });
+      }
     }
   }, [user, loading]);
 
