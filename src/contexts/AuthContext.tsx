@@ -38,8 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { refresh(); }, []);
 
-  const login  = () => { window.location.href = 'http://localhost:3001/api/auth/bnet'; };
-  const logout = () => { window.location.href = 'http://localhost:3001/api/auth/logout'; };
+  const login  = () => { window.location.href = '/api/auth/bnet'; };
+  const logout = () => { window.location.href = '/api/auth/logout'; };
 
   return <Ctx.Provider value={{ user, loading, login, logout, refresh }}>{children}</Ctx.Provider>;
 }
